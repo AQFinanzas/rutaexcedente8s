@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta Excedente 8S + Evaluativo Integrado</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1E2A8A;--navy-dark:#151F6D;--navy-bg:#F0F2FA;--orange:#E85D1A;--sky:#4E8FE0;--gold:#D4890A;--green:#1DB86E;--white:#FFFFFF;--off:#F7F9FF;--gray:#8492B4;--gray-lt:#EEF1F9;--text:#1A2240;--border:rgba(30,42,138,0.1);--shadow:0 2px 16px rgba(30,42,138,0.08);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--off);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+.top-bar{background:var(--white);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(30,42,138,0.06);}
+.brand{display:flex;align-items:center;gap:12px;}.brand-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.12em;color:var(--navy);line-height:1;}.brand-divider{width:1px;height:24px;background:var(--gray-lt);}.brand-sub{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);}
+.progress-wrap{display:flex;align-items:center;gap:10px;}.progress-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);}.progress-bar{width:140px;height:6px;background:var(--gray-lt);border-radius:10px;overflow:hidden;}.progress-fill{height:100%;background:linear-gradient(90deg,var(--navy),var(--sky));border-radius:10px;transition:width 0.5s ease;}.progress-pct{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--navy);min-width:36px;}
+.hero{background:var(--white);border-bottom:1px solid var(--border);padding:48px 32px 40px;text-align:center;}.hero-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(30,42,138,0.06);border:1px solid rgba(30,42,138,0.12);border-radius:100px;padding:5px 14px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--navy);margin-bottom:16px;}.hero-dot{width:5px;height:5px;border-radius:50%;background:var(--orange);}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.04em;line-height:0.95;color:var(--navy-dark);margin-bottom:12px;}.hero h1 em{color:var(--orange);font-style:normal;}.hero-desc{font-size:15px;color:var(--gray);font-weight:300;max-width:480px;margin:0 auto 24px;line-height:1.6;}.hero-desc strong{color:var(--navy);font-weight:500;}
+.hero-chips{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}.chip{display:flex;align-items:center;gap:6px;background:var(--off);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:11px;font-weight:500;color:var(--navy);}
+.phase-tabs{display:flex;max-width:900px;margin:32px auto 0;padding:0 24px;gap:8px;}.phase-tab{flex:1;display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:14px;border:2px solid var(--border);background:var(--white);cursor:pointer;transition:all 0.2s;text-align:left;}.phase-tab:hover{border-color:var(--navy);box-shadow:var(--shadow);}.phase-tab.active{border-color:var(--navy);background:var(--navy);}.phase-tab.active.orange{border-color:var(--orange);background:var(--orange);}
+.tab-num{width:34px;height:34px;border-radius:10px;background:var(--navy-bg);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--navy);flex-shrink:0;}.phase-tab.active .tab-num{background:rgba(255,255,255,0.2);color:white;}.tab-info{flex:1;}.tab-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);margin-bottom:2px;}.phase-tab.active .tab-label{color:rgba(255,255,255,0.6);}.tab-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.04em;color:var(--navy-dark);line-height:1;}.phase-tab.active .tab-title{color:white;}.tab-days{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;color:var(--gray);}.phase-tab.active .tab-days{color:rgba(255,255,255,0.55);}
+.main{max-width:900px;margin:0 auto;padding:24px 24px 80px;}.phase-panel{display:none;}.phase-panel.active{display:block;}
+.obj-bar{border-radius:14px;padding:16px 20px;display:flex;align-items:flex-start;gap:12px;margin-bottom:20px;border:1px solid var(--border);}.obj-bar.blue{background:rgba(30,42,138,0.04);border-left:3px solid var(--navy);}.obj-bar.orange-bar{background:rgba(232,93,26,0.04);border-left:3px solid var(--orange);}.obj-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.obj-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:3px;}.blue .obj-lbl{color:var(--navy);opacity:0.6;}.orange-bar .obj-lbl{color:var(--orange);opacity:0.7;}.obj-txt{font-size:13px;color:var(--text);font-weight:300;line-height:1.55;}.obj-txt strong{color:var(--navy);font-weight:600;}
+.week-list{display:flex;flex-direction:column;gap:10px;}.week-item{background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow 0.2s;}.week-item.open{box-shadow:0 8px 32px rgba(30,42,138,0.12);}
+.week-header{display:flex;align-items:center;gap:16px;padding:16px 20px;cursor:pointer;user-select:none;transition:background 0.15s;}.week-header:hover{background:var(--off);}
+.week-num-badge{width:52px;height:52px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,0.15);}.wn-label{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.65);}.wn-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:white;line-height:1;}
+.week-meta{flex:1;}.week-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;color:var(--navy-dark);line-height:1.1;margin-bottom:4px;}.week-tags{display:flex;gap:6px;flex-wrap:wrap;}.wtag{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;padding:3px 9px;border-radius:100px;font-weight:500;}
+.week-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}.week-status{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);}
+.week-toggle{width:28px;height:28px;border-radius:8px;background:var(--gray-lt);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gray);transition:all 0.2s;flex-shrink:0;}.week-item.open .week-toggle{transform:rotate(180deg);background:var(--navy);color:white;}
+.week-body{max-height:0;overflow:hidden;transition:max-height 0.45s cubic-bezier(0.4,0,0.2,1);}.week-body-inner{padding:0 20px 20px;border-top:1px solid var(--gray-lt);}
+.week-focus-text{font-size:12px;color:var(--gray);font-style:italic;font-weight:300;padding:12px 0 14px;line-height:1.5;}.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}.col-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--gray-lt);}.items{display:flex;flex-direction:column;gap:6px;}.item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#3A4A6B;line-height:1.4;font-weight:300;}.item-dot{width:5px;height:5px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.result-row{display:flex;align-items:flex-start;gap:9px;border-radius:10px;padding:10px 14px;font-size:12px;line-height:1.45;margin-top:4px;}.mark-btn{display:flex;align-items:center;gap:7px;margin-top:14px;padding:9px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;transition:all 0.2s;}
+/* EVAL */
+.eval-section{margin-top:22px;padding-top:18px;border-top:2px dashed var(--gray-lt);}.eval-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}.eval-badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;background:rgba(30,42,138,0.07);border:1px solid rgba(30,42,138,0.14);border-radius:100px;padding:4px 12px;color:var(--navy);}.eval-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.04em;color:var(--navy-dark);}
+.card{background:var(--off);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}.q-title{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:10px;line-height:1.4;}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+.pill-row{display:flex;flex-wrap:wrap;gap:7px;}.pill{display:flex;align-items:center;gap:7px;padding:6px 13px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-size:11px;font-weight:500;color:var(--text);transition:all 0.15s;user-select:none;}.pill-circle{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--gray);transition:all 0.15s;flex-shrink:0;}
+.rating-head{display:flex;align-items:center;margin-bottom:8px;}.rating-head-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);flex:1;}.rating-head-nums{display:flex;gap:2px;}.rhn{width:26px;text-align:center;font-family:'DM Mono',monospace;font-size:9px;color:var(--gray);}
+.rating-row{display:flex;align-items:center;padding:5px 0;border-bottom:1px solid var(--gray-lt);}.rating-row:last-child{border-bottom:none;}.rating-lbl{font-size:11px;color:var(--text);font-weight:300;flex:1;}.rating-dots{display:flex;gap:2px;}.rdot{width:26px;height:26px;border-radius:6px;background:var(--gray-lt);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--gray);cursor:pointer;transition:all 0.15s;}.rdot.selected{color:white;}
+.emoji-row{display:flex;gap:8px;flex-wrap:wrap;}.emoji-opt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);cursor:pointer;transition:all 0.15s;min-width:64px;user-select:none;}.emoji-opt:hover{border-color:var(--navy);}.emoji-icon{font-size:22px;}.emoji-txt{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;color:var(--gray);text-transform:uppercase;}
+.open-lbl{font-size:11px;font-weight:500;color:var(--navy);margin-bottom:6px;}.open-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white);resize:vertical;outline:none;line-height:1.5;}.open-input:focus{border-color:var(--navy);}
+.commit-box{border-radius:12px;padding:14px 16px;margin-bottom:10px;}.commit-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:8px;}.commit-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white);resize:none;outline:none;line-height:1.5;}.commit-input:focus{border-color:var(--navy);}
+.sign-row{display:flex;align-items:center;gap:10px;margin-top:8px;}.sign-line{flex:1;height:1px;background:var(--gray-lt);}.sign-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--gray);text-transform:uppercase;}
+.sec-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--gray-lt);}
+.eval-done-btn{width:100%;padding:11px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all 0.2s;margin-top:8px;color:white;}
+/* Week themes */
+.w1-bg{background:linear-gradient(135deg,#151F6D,#1E2A8A)}.w1-tag{background:rgba(30,42,138,0.08);color:var(--navy);border:1px solid rgba(30,42,138,0.15)}.w1-lbl{color:var(--navy)}.w1-dot{background:var(--navy)}.w1-result{background:rgba(30,42,138,0.05);border:1px solid rgba(30,42,138,0.12);color:var(--navy)}.w1-btn{background:rgba(30,42,138,0.08);color:var(--navy)}.w1-btn:hover,.w1-btn.done{background:var(--navy);color:white}
+.w2-bg{background:linear-gradient(135deg,#2A6BC4,#4E8FE0)}.w2-tag{background:rgba(78,143,224,0.1);color:var(--sky);border:1px solid rgba(78,143,224,0.2)}.w2-lbl{color:var(--sky)}.w2-dot{background:var(--sky)}.w2-result{background:rgba(78,143,224,0.06);border:1px solid rgba(78,143,224,0.18);color:#2A6BC4}.w2-btn{background:rgba(78,143,224,0.1);color:var(--sky)}.w2-btn:hover,.w2-btn.done{background:var(--sky);color:white}
+.w3-bg{background:linear-gradient(135deg,#B34210,#E85D1A)}.w3-tag{background:rgba(232,93,26,0.08);color:var(--orange);border:1px solid rgba(232,93,26,0.18)}.w3-lbl{color:var(--orange)}.w3-dot{background:var(--orange)}.w3-result{background:rgba(232,93,26,0.05);border:1px solid rgba(232,93,26,0.15);color:#B34210}.w3-btn{background:rgba(232,93,26,0.08);color:var(--orange)}.w3-btn:hover,.w3-btn.done{background:var(--orange);color:white}
+.w4-bg{background:linear-gradient(135deg,#1A5AA0,#6EB3F7)}.w4-tag{background:rgba(110,179,247,0.1);color:#1A5AA0;border:1px solid rgba(110,179,247,0.25)}.w4-lbl{color:#1A5AA0}.w4-dot{background:#6EB3F7}.w4-result{background:rgba(110,179,247,0.07);border:1px solid rgba(110,179,247,0.2);color:#1A5AA0}.w4-btn{background:rgba(110,179,247,0.1);color:#1A5AA0}.w4-btn:hover,.w4-btn.done{background:#1A5AA0;color:white}
+.w5-bg{background:linear-gradient(135deg,#8B3800,#C4560F)}.w5-tag{background:rgba(196,86,15,0.08);color:#8B3800;border:1px solid rgba(196,86,15,0.2)}.w5-lbl{color:#8B3800}.w5-dot{background:#C4560F}.w5-result{background:rgba(196,86,15,0.05);border:1px solid rgba(196,86,15,0.15);color:#8B3800}.w5-btn{background:rgba(196,86,15,0.08);color:#8B3800}.w5-btn:hover,.w5-btn.done{background:#C4560F;color:white}
+.w6-bg{background:linear-gradient(135deg,#151F6D,#3050C0)}.w6-tag{background:rgba(48,80,192,0.08);color:var(--navy);border:1px solid rgba(48,80,192,0.18)}.w6-lbl{color:var(--navy)}.w6-dot{background:#3050C0}.w6-result{background:rgba(48,80,192,0.05);border:1px solid rgba(48,80,192,0.15);color:var(--navy-dark)}.w6-btn{background:rgba(48,80,192,0.08);color:var(--navy)}.w6-btn:hover,.w6-btn.done{background:#3050C0;color:white}
+.w7-bg{background:linear-gradient(135deg,#E85D1A,#D4890A)}.w7-tag{background:rgba(212,137,10,0.08);color:#8B5500;border:1px solid rgba(212,137,10,0.2)}.w7-lbl{color:#8B5500}.w7-dot{background:var(--gold)}.w7-result{background:rgba(212,137,10,0.05);border:1px solid rgba(212,137,10,0.18);color:#8B5500}.w7-btn{background:rgba(212,137,10,0.08);color:#8B5500}.w7-btn:hover,.w7-btn.done{background:var(--gold);color:white}
+.w8-bg{background:linear-gradient(135deg,#0B6B3A,#1DB86E)}.w8-tag{background:rgba(29,184,110,0.08);color:#0B6B3A;border:1px solid rgba(29,184,110,0.2)}.w8-lbl{color:#0B6B3A}.w8-dot{background:var(--green)}.w8-result{background:rgba(29,184,110,0.07);border:1px solid rgba(29,184,110,0.2);color:#0B6B3A}.w8-btn{background:rgba(29,184,110,0.08);color:#0B6B3A}.w8-btn:hover,.w8-btn.done{background:var(--green);color:white}
+/* Eval themes */
+.e1{--ec:var(--navy);--eb:rgba(30,42,138,0.04);--ep:rgba(30,42,138,0.12)}.e2{--ec:var(--sky);--eb:rgba(78,143,224,0.04);--ep:rgba(78,143,224,0.15)}.e3{--ec:var(--orange);--eb:rgba(232,93,26,0.04);--ep:rgba(232,93,26,0.15)}.e4{--ec:#1A5AA0;--eb:rgba(110,179,247,0.04);--ep:rgba(110,179,247,0.2)}.e5{--ec:#8B3800;--eb:rgba(196,86,15,0.04);--ep:rgba(196,86,15,0.15)}.e6{--ec:var(--navy);--eb:rgba(48,80,192,0.04);--ep:rgba(48,80,192,0.15)}.e7{--ec:#8B5500;--eb:rgba(212,137,10,0.04);--ep:rgba(212,137,10,0.15)}.e8{--ec:#0B6B3A;--eb:rgba(29,184,110,0.04);--ep:rgba(29,184,110,0.15)}
+.eval-section .sec-lbl{color:var(--ec);border-color:var(--ep)}.eval-section .card{background:var(--eb);border-color:var(--ep)}.eval-section .pill.selected{background:var(--ec);color:white;border-color:var(--ec)}.eval-section .pill.selected .pill-circle{background:white;border-color:white}.eval-section .rdot.selected{background:var(--ec)}.eval-section .emoji-opt.selected{border-color:var(--ec);background:var(--eb)}.eval-section .commit-box{background:var(--eb);border:1px solid var(--ep)}.eval-section .commit-lbl{color:var(--ec)}.eval-done-btn{background:var(--ec)}.eval-done-btn:hover{opacity:0.85}.eval-done-btn.done{background:var(--green) !important}
+/* Milestones etc */
+.milestone-bar{margin-top:20px;border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid rgba(29,184,110,0.2);background:rgba(29,184,110,0.05)}.ms-icon{font-size:30px;flex-shrink:0}.ms-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);margin-bottom:3px}.ms-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;color:var(--navy-dark);margin-bottom:3px}.ms-text{font-size:12px;color:var(--gray);font-weight:300;line-height:1.5}.ms-badges{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}.ms-badge{display:flex;flex-direction:column;align-items:center;background:white;border:1px solid var(--border);border-radius:10px;padding:10px 14px;min-width:64px}.ms-badge-n{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--navy);line-height:1}.ms-badge-l{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-top:2px;line-height:1.4}
+.close-bar{margin-top:12px;border-radius:0 0 16px 16px;border:1px solid rgba(29,184,110,0.2);border-top:3px solid var(--green);padding:18px 24px;display:flex;align-items:center;gap:16px;background:rgba(29,184,110,0.04);flex-wrap:wrap}.cb-icon{font-size:28px;flex-shrink:0}.cb-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);margin-bottom:3px}.cb-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;color:var(--navy-dark);margin-bottom:3px}.cb-text{font-size:12px;color:var(--gray);font-weight:300;line-height:1.5}.cb-text strong{color:var(--navy);font-weight:600}
+.next-bar{margin-top:12px;background:linear-gradient(135deg,rgba(30,42,138,0.04),rgba(232,93,26,0.04));border:1px solid var(--border);border-top:3px solid var(--orange);border-radius:0 0 16px 16px;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer;transition:box-shadow 0.2s}.next-bar:hover{box-shadow:0 8px 24px rgba(30,42,138,0.1)}.nb-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray);margin-bottom:3px}.nb-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.04em;color:var(--navy-dark)}.nb-arrow{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--orange);opacity:0.7}
+.foot{text-align:center;margin-top:40px;padding-bottom:40px}.foot-text{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray)}
+.prac-box{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:8px 14px;margin-top:10px}.prac-n{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1}.prac-l{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);line-height:1.5}
+.student-fields{background:rgba(30,42,138,0.04);border:1px solid rgba(30,42,138,0.12);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.student-field{display:flex;flex-direction:column;gap:5px;}
+.student-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--navy);opacity:0.7;}
+.student-input{border:1px solid rgba(30,42,138,0.18);border-radius:8px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:white;outline:none;transition:border-color 0.15s;}
+.student-input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,42,138,0.08);}
+@media(max-width:640px){.student-fields{grid-template-columns:1fr;}}
+@media(max-width:640px){.top-bar{padding:12px 16px}.progress-wrap{display:none}.hero{padding:32px 16px 28px}.phase-tabs{padding:0 16px;flex-direction:column}.main{padding:16px 16px 60px}.cols,.grid-2{grid-template-columns:1fr}.ms-badges{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="top-bar"><div class="brand"><div class="brand-name">Excedente</div><div class="brand-divider"></div><div class="brand-sub">@aqfinanzas &middot; Ruta 8S + Evaluativo</div></div><div class="progress-wrap"><div class="progress-label">Progreso</div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><div class="progress-pct" id="progressPct">0%</div></div></div>
+<div class="hero"><div class="hero-pill"><div class="hero-dot"></div>Ruta de aprendizaje oficial</div><h1>RUTA <em>EXCEDENTE</em><br>8 SEMANAS</h1><p class="hero-desc">Un camino con <strong>orden y prop&#243;sito</strong>. Cada semana incluye el contenido y tu evaluativo integrado.</p><div class="hero-chips"><div class="chip">&#128197; 8 semanas &middot; 2 fases</div><div class="chip">&#127919; M&#233;todo RCR completo</div><div class="chip">&#128203; Evaluativo semanal incluido</div></div></div>
+<div style="max-width:900px;margin:24px auto 0;padding:0 24px;">
+  <div style="background:white;border:1px solid rgba(30,42,138,0.12);border-radius:16px;padding:20px 24px;box-shadow:0 2px 12px rgba(30,42,138,0.06);">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;background:rgba(30,42,138,0.07);border:1px solid rgba(30,42,138,0.14);border-radius:100px;padding:4px 12px;color:#1E2A8A;">&#128100; Datos del alumno</div>
+      <div style="font-size:12px;color:#8492B4;font-weight:300;">Completa una sola vez — se guarda en todos los evaluativos</div>
+    </div>
+    <div class="student-fields" id="studentFields">
+      <div class="student-field"><label class="student-label">Nombre</label><input class="student-input" id="alumnoNombre" type="text" placeholder="Tu nombre" oninput="saveStudent()"></div>
+      <div class="student-field"><label class="student-label">Apellido</label><input class="student-input" id="alumnoApellido" type="text" placeholder="Tu apellido" oninput="saveStudent()"></div>
+      <div class="student-field"><label class="student-label">Correo electrónico</label><input class="student-input" id="alumnoEmail" type="email" placeholder="tu@correo.com" oninput="saveStudent()"></div>
+    </div>
+  </div>
+</div>
+
+<div class="phase-tabs"><div class="phase-tab active" onclick="switchPhase(1)" id="tab1"><div class="tab-num">1</div><div class="tab-info"><div class="tab-label">Primera fase</div><div class="tab-title">SEMANAS 1&#8211;4</div><div class="tab-days">D&#237;as 1&#8211;30 &middot; M&#243;d. 1&#8211;6</div></div></div><div class="phase-tab" onclick="switchPhase(2)" id="tab2"><div class="tab-num">2</div><div class="tab-info"><div class="tab-label">Segunda fase</div><div class="tab-title">SEMANAS 5&#8211;8</div><div class="tab-days">D&#237;as 31&#8211;60 &middot; M&#243;d. 7&#8211;11</div></div></div></div>
+<div class="main">
+  <div class="phase-panel active" id="panel1">
+    <div class="obj-bar blue"><div class="obj-icon">&#128204;</div><div><div class="obj-lbl">Objetivo de la fase</div><div class="obj-txt">Entender el ecosistema Excedente, abrir tu cuenta demo en <strong>Tradingview</strong>, ejecutar tus primeras operaciones y absorber la teor&#237;a del <strong>M&#233;todo RCR</strong>.</div></div></div>
+    <div class="week-list">
+      <div class="week-item open" id="w1">
+        <div class="week-header" onclick="toggleWeek('w1')">
+          <div class="week-num-badge w1-bg"><div class="wn-label">SEM</div><div class="wn-num">1</div></div>
+          <div class="week-meta">
+            <div class="week-title">BIENVENIDA + CUENTA DEMO</div>
+            <div class="week-tags"><span class="wtag w1-tag">Mód. 1 · 2</span><span class="wtag w1-tag">Días 1–7</span></div>
+          </div>
+          <div class="week-right">
+            <div class="week-status" id="w1-status">Pendiente</div>
+            <div class="week-toggle">&#9660;</div>
+          </div>
+        </div>
+        <div class="week-body" id="w1-body" style="max-height:4000px">
+          <div class="week-body-inner">
+            <div class="week-focus-text">Completar el Módulo 1, definir tu perfil de inversionista, usar la calculadora y dejar la cuenta demo lista en Tradingview. Esta semana es 100% teoría — las operaciones comienzan en semana 2.</div>
+            <div class="cols"><div class="col-block"><div class="col-lbl w1-lbl">Módulo 1 — Primeros pasos</div><div class="items"><div class="item"><div class="item-dot w1-dot"></div>Lección 1: Bienvenid@ a Excedente.</div><div class="item"><div class="item-dot w1-dot"></div>Lección 2: Ruta Excedente 8S.</div><div class="item"><div class="item-dot w1-dot"></div>Lección 3: Definir tu perfil de inversionista.</div><div class="item"><div class="item-dot w1-dot"></div>Lección 4: La mentalidad adecuada.</div><div class="item"><div class="item-dot w1-dot"></div>Lección 5: La Arquitectura del Dinero.</div><div class="item"><div class="item-dot w1-dot"></div>Lección 6: El compromiso con tu futuro.</div><div class="item"><div class="item-dot w1-dot"></div>Lección 7: Sesiones Semanales en Vivo.</div><div class="item"><div class="item-dot w1-dot"></div>Lección 8: Calculadora de escenarios financieros.</div></div></div><div class="col-block"><div class="col-lbl w1-lbl">Módulo 2 — Cuenta demo</div><div class="items"><div class="item"><div class="item-dot w1-dot"></div>¿Por qué contar con una cuenta demo?</div><div class="item"><div class="item-dot w1-dot"></div>Abrir tu cuenta en Tradingview.</div><div class="item"><div class="item-dot w1-dot"></div>Cómo está configurada la plataforma.</div><div class="item"><div class="item-dot w1-dot"></div>Configurar herramientas en Tradingview.</div><div class="item"><div class="item-dot w1-dot"></div>Explorar la interfaz — sin operar aún.</div><div class="item"><div class="item-dot w1-dot"></div>✓ Al cerrar esta semana: cuenta demo activa y lista para operar en semana 2.</div></div></div></div>
+            <div class="result-row w1-result">✓ Módulo 1 completo, perfil definido, cuenta demo activa en Tradingview — listo para comenzar a operar en semana 2.</div>
+            <button class="mark-btn w1-btn" onclick="markDone('w1')">&#10003; Marcar contenido como visto</button>
+            <div class="eval-section e1">
+              <div class="eval-header">
+                <div class="eval-badge">&#128203; Evaluativo</div>
+                <div class="eval-title">AUTOEVALUACI&#211;N &middot; SEMANA 1</div>
+              </div>
+
+              <div class="sec-lbl sl1">✓ Completé esta semana</div>
+    <div class="card">
+      <div class="q-title">¿Qué completaste? Selecciona todo lo que hiciste:</div>
+      <div class="pill-row">
+        <div class="pill p1" onclick="togglePill(this)"><div class="pill-circle"></div>Módulo 1 completo</div>
+        <div class="pill p1" onclick="togglePill(this)"><div class="pill-circle"></div>Módulo 2 completo</div>
+        <div class="pill p1" onclick="togglePill(this)"><div class="pill-circle"></div>Cuenta demo en Tradingview</div>
+        
+        <div class="pill p1" onclick="togglePill(this)"><div class="pill-circle"></div>Descargué La Arquitectura del Dinero</div>
+        <div class="pill p1" onclick="togglePill(this)"><div class="pill-circle"></div>Entré al grupo de WhatsApp</div>
+        <div class="pill p1" onclick="togglePill(this)"><div class="pill-circle"></div>Definí mi perfil de inversionista</div>
+        <div class="pill p1" onclick="togglePill(this)"><div class="pill-circle"></div>Usé la calculadora de escenarios</div>
+      </div>
+    </div>
+    <div class="sec-lbl sl1">📊 Mi autoevaluación</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="rating-head"><div class="rating-head-lbl">Indicador</div><div class="rating-head-nums"><div class="rhn">1</div><div class="rhn">2</div><div class="rhn">3</div><div class="rhn">4</div><div class="rhn">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Claridad del contenido</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Ejecución de tareas</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Mi constancia</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Cómo salgo de esta semana?</div>
+        <div class="emoji-row">
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😕</div><div class="emoji-txt">Perdido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🙂</div><div class="emoji-txt">Regular</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😊</div><div class="emoji-txt">Bien</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">💪</div><div class="emoji-txt">Sólido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🔥</div><div class="emoji-txt">On fire</div></div>
+        </div>
+        <div class="open-lbl">Mayor aprendizaje:</div>
+        <textarea class="open-input" rows="2" placeholder="Escribe aquí..."></textarea>
+      </div>
+    </div>
+    <div class="commit-box cm1">
+      <div class="commit-lbl cml1">Mi compromiso para la semana 2</div>
+      <textarea class="commit-input" rows="2" placeholder="Escribe tu compromiso..."></textarea>
+      <div class="sign-row"><div class="sign-line"></div><div class="sign-lbl">Firma · Sem 1</div></div>
+    </div>
+              <button class="eval-done-btn" id="evdone1" onclick="markEvalDone(1)">&#10003; Guardar evaluativo semana 1</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="week-item" id="w2">
+        <div class="week-header" onclick="toggleWeek('w2')">
+          <div class="week-num-badge w2-bg"><div class="wn-label">SEM</div><div class="wn-num">2</div></div>
+          <div class="week-meta">
+            <div class="week-title">PRIMERAS OPERACIONES EN DEMO</div>
+            <div class="week-tags"><span class="wtag w2-tag">Práctica libre</span><span class="wtag w2-tag">Días 8–14</span></div>
+          </div>
+          <div class="week-right">
+            <div class="week-status" id="w2-status">Pendiente</div>
+            <div class="week-toggle">&#9660;</div>
+          </div>
+        </div>
+        <div class="week-body" id="w2-body">
+          <div class="week-body-inner">
+            <div class="week-focus-text">Sin módulo nuevo — aquí comienzan tus primeras operaciones en demo. Usas todo lo visto en el Módulo 2 para empezar a explorar el mercado sin riesgo.</div>
+            <div class="cols"><div class="col-block"><div class="col-lbl w2-lbl">Qué practicas</div><div class="items"><div class="item"><div class="item-dot w2-dot"></div>Colocar órdenes de compra y venta en demo.</div><div class="item"><div class="item-dot w2-dot"></div>Observar cómo se mueve el precio.</div><div class="item"><div class="item-dot w2-dot"></div>Explorar acciones: Apple, Tesla, Amazon.</div></div></div><div class="col-block"><div class="col-lbl w2-lbl">Para qué sirve</div><div class="items"><div class="item"><div class="item-dot w2-dot"></div>Romper el miedo inicial al mercado.</div><div class="item"><div class="item-dot w2-dot"></div>Ganar fluidez en Tradingview.</div><div class="item"><div class="item-dot w2-dot"></div>Generar preguntas reales para semana 3.</div></div></div></div>
+            <div class="result-row w2-result">✓ Tus primeras operaciones en demo completadas. Llegas a semana 3 con preguntas reales y confianza en la plataforma.</div>
+            <button class="mark-btn w2-btn" onclick="markDone('w2')">&#10003; Marcar contenido como visto</button>
+            <div class="eval-section e2">
+              <div class="eval-header">
+                <div class="eval-badge">&#128203; Evaluativo</div>
+                <div class="eval-title">AUTOEVALUACI&#211;N &middot; SEMANA 2</div>
+              </div>
+              <div id="studentBanner2" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;background:rgba(30,42,138,0.04);border-radius:8px;display:none;"></div>
+              <div class="sec-lbl sl2">✓ Completé esta semana</div>
+    <div class="card" style="max-width:400px;">
+        <div class="q-title">¿Cuántas operaciones en demo realizaste?</div>
+        <div class="pill-row">
+          <div class="pill p2" onclick="toggleSingle(this)"><div class="pill-circle"></div>1–2 operaciones</div>
+          <div class="pill p2" onclick="toggleSingle(this)"><div class="pill-circle"></div>3–4 operaciones</div>
+          <div class="pill p2" onclick="toggleSingle(this)"><div class="pill-circle"></div>5 o más ✓</div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-lbl sl2">📊 Mi autoevaluación</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="rating-head"><div class="rating-head-lbl">Indicador</div><div class="rating-head-nums"><div class="rhn">1</div><div class="rhn">2</div><div class="rhn">3</div><div class="rhn">4</div><div class="rhn">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Fluidez en Tradingview</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Mi constancia</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Cómo salgo de esta semana?</div>
+        <div class="emoji-row">
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😕</div><div class="emoji-txt">Perdido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🙂</div><div class="emoji-txt">Regular</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😊</div><div class="emoji-txt">Bien</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">💪</div><div class="emoji-txt">Sólido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🔥</div><div class="emoji-txt">On fire</div></div>
+        </div>
+        <div class="open-lbl">Preguntas que me generó operar:</div>
+        <textarea class="open-input" rows="2" placeholder="Escribe aquí..."></textarea>
+      </div>
+    </div>
+    <div class="commit-box cm2"><div class="commit-lbl cml2">Mi compromiso para la semana 3</div><textarea class="commit-input" rows="2" placeholder="Escribe tu compromiso..."></textarea><div class="sign-row"><div class="sign-line"></div><div class="sign-lbl">Firma · Sem 2</div></div></div>
+              <button class="eval-done-btn" id="evdone2" onclick="markEvalDone(2)">&#10003; Guardar evaluativo semana 2</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="week-item" id="w3">
+        <div class="week-header" onclick="toggleWeek('w3')">
+          <div class="week-num-badge w3-bg"><div class="wn-label">SEM</div><div class="wn-num">3</div></div>
+          <div class="week-meta">
+            <div class="week-title">FUNDAMENTOS DEL MERCADO</div>
+            <div class="week-tags"><span class="wtag w3-tag">Mód. 3 · Mercados</span><span class="wtag w3-tag">Días 15–21</span></div>
+          </div>
+          <div class="week-right">
+            <div class="week-status" id="w3-status">Pendiente</div>
+            <div class="week-toggle">&#9660;</div>
+          </div>
+        </div>
+        <div class="week-body" id="w3-body">
+          <div class="week-body-inner">
+            <div class="week-focus-text">Estudiar el Módulo 3 con los conceptos del mercado y continuar practicando en demo — el perfil ya fue definido en semana 1.</div>
+            <div class="cols"><div class="col-block"><div class="col-lbl w3-lbl">Módulo 3 — El mercado</div><div class="items"><div class="item"><div class="item-dot w3-dot"></div>Conceptos base del mercado de acciones NYSE.</div><div class="item"><div class="item-dot w3-dot"></div>Cómo funciona la Bolsa y por qué se mueve el precio.</div><div class="item"><div class="item-dot w3-dot"></div>Diferencia entre acciones, ETFs e índices.</div><div class="item"><div class="item-dot w3-dot"></div>El SPY como termómetro del mercado general.</div><div class="item"><div class="item-dot w3-dot"></div>Lecciones finales y ejercicios del módulo.</div></div></div><div class="col-block"><div class="col-lbl w3-lbl">Práctica en demo — continúa</div><div class="items"><div class="item"><div class="item-dot w3-dot"></div>Seguir operando en demo con lo aprendido.</div><div class="item"><div class="item-dot w3-dot"></div>Observar el SPY y comparar con tus acciones.</div><div class="item"><div class="item-dot w3-dot"></div>Identificar ETFs vs acciones individuales en Tradingview.</div><div class="item"><div class="item-dot w3-dot"></div>Registrar observaciones: ¿qué notas en el mercado?</div><div class="item"><div class="item-dot w3-dot"></div>Llevar dudas del módulo a la sesión en vivo.</div></div></div></div>
+            <div class="result-row w3-result">✓ Conoces las bases del mercado y sigues ganando práctica en demo.</div>
+            <button class="mark-btn w3-btn" onclick="markDone('w3')">&#10003; Marcar contenido como visto</button>
+            <div class="eval-section e3">
+              <div class="eval-header">
+                <div class="eval-badge">&#128203; Evaluativo</div>
+                <div class="eval-title">AUTOEVALUACI&#211;N &middot; SEMANA 3</div>
+              </div>
+              <div id="studentBanner3" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;background:rgba(30,42,138,0.04);border-radius:8px;display:none;"></div>
+              <div class="sec-lbl sl3">✓ Completé esta semana</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="q-title">¿Qué completaste?</div>
+        <div class="pill-row">
+          <div class="pill p3" onclick="togglePill(this)"><div class="pill-circle"></div>Módulo 3 completo</div>
+          <div class="pill p3" onclick="togglePill(this)"><div class="pill-circle"></div>Seguí practicando en demo</div>
+          
+        </div>
+      </div>
+    </div>
+    <div class="sec-lbl sl3">📊 Mi autoevaluación</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="rating-head"><div class="rating-head-lbl">Indicador</div><div class="rating-head-nums"><div class="rhn">1</div><div class="rhn">2</div><div class="rhn">3</div><div class="rhn">4</div><div class="rhn">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Comprensión del mercado</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Claridad de mi perfil</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Cómo salgo de esta semana?</div>
+        <div class="emoji-row">
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😕</div><div class="emoji-txt">Perdido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🙂</div><div class="emoji-txt">Regular</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😊</div><div class="emoji-txt">Bien</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">💪</div><div class="emoji-txt">Sólido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🔥</div><div class="emoji-txt">On fire</div></div>
+        </div>
+        <div class="open-lbl">Duda o pregunta pendiente:</div>
+        <textarea class="open-input" rows="2" placeholder="Escribe aquí..."></textarea>
+      </div>
+    </div>
+    <div class="commit-box cm3"><div class="commit-lbl cml3">Mi compromiso para la semana 4</div><textarea class="commit-input" rows="2" placeholder="Escribe tu compromiso..."></textarea><div class="sign-row"><div class="sign-line"></div><div class="sign-lbl">Firma · Sem 3</div></div></div>
+              <button class="eval-done-btn" id="evdone3" onclick="markEvalDone(3)">&#10003; Guardar evaluativo semana 3</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="week-item" id="w4">
+        <div class="week-header" onclick="toggleWeek('w4')">
+          <div class="week-num-badge w4-bg"><div class="wn-label">SEM</div><div class="wn-num">4</div></div>
+          <div class="week-meta">
+            <div class="week-title">ANÁLISIS TÉCNICO + MÉTODO RCR · TEORÍA</div>
+            <div class="week-tags"><span class="wtag w4-tag">Mód. 4 · 5 · 6 Teoría</span><span class="wtag w4-tag">Días 22–30</span></div>
+          </div>
+          <div class="week-right">
+            <div class="week-status" id="w4-status">Pendiente</div>
+            <div class="week-toggle">&#9660;</div>
+          </div>
+        </div>
+        <div class="week-body" id="w4-body">
+          <div class="week-body-inner">
+            <div class="week-focus-text">Semana de teoría pura. La práctica viene en semana 5 — primero entiéndelos bien.</div>
+            <div class="cols"><div class="col-block"><div class="col-lbl w4-lbl">Mód. 4 — Análisis técnico</div><div class="items"><div class="item"><div class="item-dot w4-dot"></div>Velas japonesas y lectura del precio.</div><div class="item"><div class="item-dot w4-dot"></div>Promedios móviles SMA 20 y SMA 200.</div><div class="item"><div class="item-dot w4-dot"></div>Temporalidad: velas diarias.</div><div class="item"><div class="item-dot w4-dot"></div>Contracción, expansión y estructura.</div></div></div><div class="col-block"><div class="col-lbl w4-lbl">Mód. 5 · 6 — RCR + Gestión</div><div class="items"><div class="item"><div class="item-dot w4-dot"></div>Primeras estrategias del Método RCR.</div><div class="item"><div class="item-dot w4-dot"></div>Lógica de entrada y confirmación.</div><div class="item"><div class="item-dot w4-dot"></div>Stop loss y punto de equilibrio.</div><div class="item"><div class="item-dot w4-dot"></div>Gestión de la operación fase por fase.</div></div></div></div>
+            <div class="result-row w4-result">✓ Estructura teórica completa del Método RCR absorbida.</div>
+            <button class="mark-btn w4-btn" onclick="markDone('w4')">&#10003; Marcar contenido como visto</button>
+            <div class="eval-section e4">
+              <div class="eval-header">
+                <div class="eval-badge">&#128203; Evaluativo</div>
+                <div class="eval-title">AUTOEVALUACI&#211;N &middot; SEMANA 4</div>
+              </div>
+              <div id="studentBanner4" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;background:rgba(30,42,138,0.04);border-radius:8px;display:none;"></div>
+              <div class="sec-lbl sl4">✓ Completé esta semana</div>
+    <div class="card">
+      <div class="q-title">¿Qué completaste esta semana?</div>
+      <div class="pill-row">
+        <div class="pill p4" onclick="togglePill(this)"><div class="pill-circle"></div>Vi la teoría del Módulo 4</div>
+        <div class="pill p4" onclick="togglePill(this)"><div class="pill-circle"></div>Vi la teoría del Módulo 5</div>
+        <div class="pill p4" onclick="togglePill(this)"><div class="pill-circle"></div>Vi la teoría del Módulo 6</div>
+        <div class="pill p4" onclick="togglePill(this)"><div class="pill-circle"></div>Hice los ejercicios finales del Módulo 4</div>
+        <div class="pill p4" onclick="togglePill(this)"><div class="pill-circle"></div>Hice los ejercicios finales del Módulo 5</div>
+        <div class="pill p4" onclick="togglePill(this)"><div class="pill-circle"></div>Hice los ejercicios finales del Módulo 6</div>
+      </div>
+    </div>
+    <div class="sec-lbl sl4">📊 Mi autoevaluación</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="rating-head"><div class="rating-head-lbl">Indicador</div><div class="rating-head-nums"><div class="rhn">1</div><div class="rhn">2</div><div class="rhn">3</div><div class="rhn">4</div><div class="rhn">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Comprensión análisis técnico</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Entendimiento Método RCR</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Claridad sobre gestión</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Cómo salgo de esta semana?</div>
+        <div class="emoji-row">
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😕</div><div class="emoji-txt">Perdido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🙂</div><div class="emoji-txt">Regular</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😊</div><div class="emoji-txt">Bien</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">💪</div><div class="emoji-txt">Sólido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🔥</div><div class="emoji-txt">On fire</div></div>
+        </div>
+        <div class="open-lbl">Lo que necesito aclarar antes de la semana 5:</div>
+        <textarea class="open-input" rows="2" placeholder="Escribe aquí..."></textarea>
+      </div>
+    </div>
+    <div class="commit-box cm4"><div class="commit-lbl cml4">Mi compromiso para la semana 5</div><textarea class="commit-input" rows="2" placeholder="Escribe tu compromiso..."></textarea><div class="sign-row"><div class="sign-line"></div><div class="sign-lbl">Firma · Sem 4</div></div></div>
+              <button class="eval-done-btn" id="evdone4" onclick="markEvalDone(4)">&#10003; Guardar evaluativo semana 4</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    <div class="milestone-bar"><div class="ms-icon">&#127937;</div><div><div class="ms-lbl">Al cerrar el d&#237;a 30</div><div class="ms-title">RESULTADO SEMANAS 1&#8211;4</div><div class="ms-text">Cuenta demo activa, operaciones ejecutadas, mercado comprendido, perfil definido y teor&#237;a RCR absorbida.</div></div><div class="ms-badges"><div class="ms-badge"><div class="ms-badge-n">3</div><div class="ms-badge-l">M&#243;dulos<br>vistos</div></div><div class="ms-badge"><div class="ms-badge-n">5+</div><div class="ms-badge-l">Ops demo<br>libres</div></div><div class="ms-badge"><div class="ms-badge-n">&#8594;</div><div class="ms-badge-l">Listo<br>Fase 2</div></div></div></div>
+    <div class="next-bar" onclick="switchPhase(2)"><div><div class="nb-lbl">Siguiente etapa</div><div class="nb-title">FASE 2 &middot; SEMANAS 5&#8211;8 &middot; PR&#193;CTICA INTENSIVA &#8594;</div></div><div class="nb-arrow">&#8594;</div></div>
+  </div>
+  <div class="phase-panel" id="panel2">
+    <div class="obj-bar orange-bar"><div class="obj-icon">&#128204;</div><div><div class="obj-lbl">Objetivo de la fase</div><div class="obj-txt">Dominar el <strong>M&#233;todo RCR</strong> con pr&#225;ctica intensiva en demo y construir tu <strong>plan de inversi&#243;n personal</strong>.</div></div></div>
+    <div class="week-list">
+      <div class="week-item" id="w5">
+        <div class="week-header" onclick="toggleWeek('w5')">
+          <div class="week-num-badge w5-bg"><div class="wn-label">SEM</div><div class="wn-num">5</div></div>
+          <div class="week-meta">
+            <div class="week-title">ANÁLISIS TÉCNICO + RCR · PRÁCTICA DEMO</div>
+            <div class="week-tags"><span class="wtag w5-tag">Mód. 4 · 5 · 6 Práctica</span><span class="wtag w5-tag">Días 31–37</span></div>
+          </div>
+          <div class="week-right">
+            <div class="week-status" id="w5-status">Pendiente</div>
+            <div class="week-toggle">&#9660;</div>
+          </div>
+        </div>
+        <div class="week-body" id="w5-body">
+          <div class="week-body-inner">
+            <div class="week-focus-text">La teoría de semana 4 se lleva al broker demo. Práctica estructurada con RCR.</div>
+            <div class="cols"><div class="col-block"><div class="col-lbl w5-lbl">Qué practicas en demo</div><div class="items"><div class="item"><div class="item-dot w5-dot"></div>Identificar SMA 20 y SMA 200.</div><div class="item"><div class="item-dot w5-dot"></div>Detectar contracciones y expansiones.</div><div class="item"><div class="item-dot w5-dot"></div>Aplicar estrategias RCR en demo.</div><div class="item"><div class="item-dot w5-dot"></div>Colocar entrada, stop loss y equilibrio.</div><div class="item"><div class="item-dot w5-dot"></div>Gestionar la operación fase por fase.</div></div></div><div class="col-block"><div class="col-lbl w5-lbl">Cómo lo ejecutas</div><div class="items"><div class="item"><div class="item-dot w5-dot"></div>Ejercicios finales de Módulos 4, 5 y 6.</div><div class="item"><div class="item-dot w5-dot"></div>Registrar cada operación.</div><div class="item"><div class="item-dot w5-dot"></div>No buscar ganancias — buscar estructura.</div><div class="item"><div class="item-dot w5-dot"></div>Apoyarte en Gemini para dudas.</div></div></div></div>
+            <div class="result-row w5-result">✓ 10 operaciones demo con estructura RCR completa.</div>
+            <button class="mark-btn w5-btn" onclick="markDone('w5')">&#10003; Marcar contenido como visto</button>
+            <div class="eval-section e5">
+              <div class="eval-header">
+                <div class="eval-badge">&#128203; Evaluativo</div>
+                <div class="eval-title">AUTOEVALUACI&#211;N &middot; SEMANA 5</div>
+              </div>
+              <div id="studentBanner5" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;background:rgba(30,42,138,0.04);border-radius:8px;display:none;"></div>
+              <div class="sec-lbl sl5">✓ Completé esta semana</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="q-title">¿Cuántas operaciones demo con método RCR?</div>
+        <div class="pill-row">
+          <div class="pill p5" onclick="toggleSingle(this)"><div class="pill-circle"></div>Menos de 5</div>
+          <div class="pill p5" onclick="toggleSingle(this)"><div class="pill-circle"></div>5–7 operaciones</div>
+          <div class="pill p5" onclick="toggleSingle(this)"><div class="pill-circle"></div>8–9 operaciones</div>
+          <div class="pill p5" onclick="toggleSingle(this)"><div class="pill-circle"></div>10 o más ✓ Meta</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Qué aplicaste correctamente?</div>
+        <div class="pill-row">
+          <div class="pill p5" onclick="togglePill(this)"><div class="pill-circle"></div>Entrada con confirmación</div>
+          <div class="pill p5" onclick="togglePill(this)"><div class="pill-circle"></div>Stop loss colocado</div>
+          <div class="pill p5" onclick="togglePill(this)"><div class="pill-circle"></div>Punto de equilibrio</div>
+          <div class="pill p5" onclick="togglePill(this)"><div class="pill-circle"></div>Gestión fase por fase</div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-lbl sl5">📊 Mi autoevaluación</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="rating-head"><div class="rating-head-lbl">Indicador</div><div class="rating-head-nums"><div class="rhn">1</div><div class="rhn">2</div><div class="rhn">3</div><div class="rhn">4</div><div class="rhn">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Calidad de mis operaciones</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Aplicación correcta del método</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Disciplina sin buscar ganancias</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Cómo salgo de esta semana?</div>
+        <div class="emoji-row">
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😕</div><div class="emoji-txt">Perdido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🙂</div><div class="emoji-txt">Regular</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😊</div><div class="emoji-txt">Bien</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">💪</div><div class="emoji-txt">Sólido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🔥</div><div class="emoji-txt">On fire</div></div>
+        </div>
+        <div class="open-lbl">Error principal que debo corregir:</div>
+        <textarea class="open-input" rows="2" placeholder="Escribe aquí..."></textarea>
+      </div>
+    </div>
+    <div class="commit-box cm5"><div class="commit-lbl cml5">Mi compromiso para la semana 6</div><textarea class="commit-input" rows="2" placeholder="Escribe tu compromiso..."></textarea><div class="sign-row"><div class="sign-line"></div><div class="sign-lbl">Firma · Sem 5</div></div></div>
+              <button class="eval-done-btn" id="evdone5" onclick="markEvalDone(5)">&#10003; Guardar evaluativo semana 5</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="week-item" id="w6">
+        <div class="week-header" onclick="toggleWeek('w6')">
+          <div class="week-num-badge w6-bg"><div class="wn-label">SEM</div><div class="wn-num">6</div></div>
+          <div class="week-meta">
+            <div class="week-title">RCR ÉLITE + MOMENTUM · TEORÍA</div>
+            <div class="week-tags"><span class="wtag w6-tag">Mód. 7 · 8 · 9 Teoría</span><span class="wtag w6-tag">Días 38–44</span></div>
+          </div>
+          <div class="week-right">
+            <div class="week-status" id="w6-status">Pendiente</div>
+            <div class="week-toggle">&#9660;</div>
+          </div>
+        </div>
+        <div class="week-body" id="w6-body">
+          <div class="week-body-inner">
+            <div class="week-focus-text">Estrategias avanzadas del Método RCR. Teoría primero — práctica en semana 7.</div>
+            <div class="cols"><div class="col-block"><div class="col-lbl w6-lbl">Mód. 7 — RCR Élite</div><div class="items"><div class="item"><div class="item-dot w6-dot"></div>Estrategia de mediano plazo.</div><div class="item"><div class="item-dot w6-dot"></div>Tendencia del mercado con SPY.</div><div class="item"><div class="item-dot w6-dot"></div>Análisis fundamental en el proceso.</div><div class="item"><div class="item-dot w6-dot"></div>Ejercicios de la última lección.</div></div></div><div class="col-block"><div class="col-lbl w6-lbl">Mód. 8 · 9 — Momentum</div><div class="items"><div class="item"><div class="item-dot w6-dot"></div>RCR Momentum: acciones con intención.</div><div class="item"><div class="item-dot w6-dot"></div>Gestión del riesgo por estrategia.</div><div class="item"><div class="item-dot w6-dot"></div>Gestión fase por fase en mediano plazo.</div><div class="item"><div class="item-dot w6-dot"></div>Cuándo llegar a Fase 1 vs stop loss.</div></div></div></div>
+            <div class="result-row w6-result">✓ Teoría avanzada del Método RCR dominada.</div>
+            <button class="mark-btn w6-btn" onclick="markDone('w6')">&#10003; Marcar contenido como visto</button>
+            <div class="eval-section e6">
+              <div class="eval-header">
+                <div class="eval-badge">&#128203; Evaluativo</div>
+                <div class="eval-title">AUTOEVALUACI&#211;N &middot; SEMANA 6</div>
+              </div>
+              <div id="studentBanner6" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;background:rgba(30,42,138,0.04);border-radius:8px;display:none;"></div>
+              <div class="sec-lbl sl6">✓ Completé esta semana</div>
+    <div class="card">
+      <div class="q-title">¿Qué completaste?</div>
+      <div class="pill-row">
+        <div class="pill p6" onclick="togglePill(this)"><div class="pill-circle"></div>Módulo 7 — RCR Élite</div>
+        <div class="pill p6" onclick="togglePill(this)"><div class="pill-circle"></div>Módulo 8 — RCR Momentum</div>
+        <div class="pill p6" onclick="togglePill(this)"><div class="pill-circle"></div>Módulo 9 — Gestión mediano plazo</div>
+        <div class="pill p6" onclick="togglePill(this)"><div class="pill-circle"></div>Entendí diferencia Élite vs Momentum</div>
+        <div class="pill p6" onclick="togglePill(this)"><div class="pill-circle"></div>Entendí el rol del SPY en el método</div>
+      </div>
+    </div>
+    <div class="sec-lbl sl6">📊 Mi autoevaluación</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="rating-head"><div class="rating-head-lbl">Indicador</div><div class="rating-head-nums"><div class="rhn">1</div><div class="rhn">2</div><div class="rhn">3</div><div class="rhn">4</div><div class="rhn">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Comprensión RCR Élite</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Comprensión RCR Momentum</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Gestión de mediano plazo</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Cómo salgo de esta semana?</div>
+        <div class="emoji-row">
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😕</div><div class="emoji-txt">Perdido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🙂</div><div class="emoji-txt">Regular</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😊</div><div class="emoji-txt">Bien</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">💪</div><div class="emoji-txt">Sólido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🔥</div><div class="emoji-txt">On fire</div></div>
+        </div>
+        <div class="open-lbl">Lo que necesito aclarar antes de practicar:</div>
+        <textarea class="open-input" rows="2" placeholder="Escribe aquí..."></textarea>
+      </div>
+    </div>
+    <div class="commit-box cm6"><div class="commit-lbl cml6">Mi compromiso para la semana 7</div><textarea class="commit-input" rows="2" placeholder="Escribe tu compromiso..."></textarea><div class="sign-row"><div class="sign-line"></div><div class="sign-lbl">Firma · Sem 6</div></div></div>
+              <button class="eval-done-btn" id="evdone6" onclick="markEvalDone(6)">&#10003; Guardar evaluativo semana 6</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="week-item" id="w7">
+        <div class="week-header" onclick="toggleWeek('w7')">
+          <div class="week-num-badge w7-bg"><div class="wn-label">SEM</div><div class="wn-num">7</div></div>
+          <div class="week-meta">
+            <div class="week-title">RCR ÉLITE + MOMENTUM · PRÁCTICA DEMO</div>
+            <div class="week-tags"><span class="wtag w7-tag">Mód. 7 · 8 · 9 Práctica</span><span class="wtag w7-tag">Días 45–51</span></div>
+          </div>
+          <div class="week-right">
+            <div class="week-status" id="w7-status">Pendiente</div>
+            <div class="week-toggle">&#9660;</div>
+          </div>
+        </div>
+        <div class="week-body" id="w7-body">
+          <div class="week-body-inner">
+            <div class="week-focus-text">Las estrategias avanzadas llevadas al broker demo.</div>
+            <div class="cols"><div class="col-block"><div class="col-lbl w7-lbl">Qué practicas en demo</div><div class="items"><div class="item"><div class="item-dot w7-dot"></div>Aplicar RCR Élite en mediano plazo.</div><div class="item"><div class="item-dot w7-dot"></div>Identificar acciones con momentum.</div><div class="item"><div class="item-dot w7-dot"></div>Gestionar la operación completa.</div><div class="item"><div class="item-dot w7-dot"></div>Ejercicios finales Módulos 7, 8 y 9.</div></div></div><div class="col-block"><div class="col-lbl w7-lbl">Lo que desarrollas</div><div class="items"><div class="item"><div class="item-dot w7-dot"></div>Criterio para detectar oportunidades.</div><div class="item"><div class="item-dot w7-dot"></div>Disciplina sin confirmación del método.</div><div class="item"><div class="item-dot w7-dot"></div>Registro para detectar tus patrones.</div></div></div></div>
+            <div class="result-row w7-result">✓ RCR Élite y Momentum practicados. Listo para tu plan.</div>
+            <button class="mark-btn w7-btn" onclick="markDone('w7')">&#10003; Marcar contenido como visto</button>
+            <div class="eval-section e7">
+              <div class="eval-header">
+                <div class="eval-badge">&#128203; Evaluativo</div>
+                <div class="eval-title">AUTOEVALUACI&#211;N &middot; SEMANA 7</div>
+              </div>
+              <div id="studentBanner7" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;background:rgba(30,42,138,0.04);border-radius:8px;display:none;"></div>
+              <div class="sec-lbl sl7">✓ Completé esta semana</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="q-title">¿Cuántas operaciones avanzadas en demo?</div>
+        <div class="pill-row">
+          <div class="pill p7" onclick="toggleSingle(this)"><div class="pill-circle"></div>1 operación</div>
+          <div class="pill p7" onclick="toggleSingle(this)"><div class="pill-circle"></div>2 operaciones</div>
+          <div class="pill p7" onclick="toggleSingle(this)"><div class="pill-circle"></div>3 ✓ Meta</div>
+          <div class="pill p7" onclick="toggleSingle(this)"><div class="pill-circle"></div>Más de 3</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Qué estrategia aplicaste?</div>
+        <div class="pill-row">
+          <div class="pill p7" onclick="togglePill(this)"><div class="pill-circle"></div>RCR Élite</div>
+          <div class="pill p7" onclick="togglePill(this)"><div class="pill-circle"></div>RCR Momentum</div>
+          <div class="pill p7" onclick="togglePill(this)"><div class="pill-circle"></div>Ambas</div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-lbl sl7">📊 Mi autoevaluación</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="rating-head"><div class="rating-head-lbl">Indicador</div><div class="rating-head-nums"><div class="rhn">1</div><div class="rhn">2</div><div class="rhn">3</div><div class="rhn">4</div><div class="rhn">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Criterio para seleccionar acciones</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Aplicación de estrategias avanzadas</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Disciplina y control emocional</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Cómo salgo de esta semana?</div>
+        <div class="emoji-row">
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😕</div><div class="emoji-txt">Perdido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🙂</div><div class="emoji-txt">Regular</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😊</div><div class="emoji-txt">Bien</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">💪</div><div class="emoji-txt">Sólido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🔥</div><div class="emoji-txt">On fire</div></div>
+        </div>
+        <div class="open-lbl">Error o patrón que debo corregir:</div>
+        <textarea class="open-input" rows="2" placeholder="Escribe aquí..."></textarea>
+      </div>
+    </div>
+    <div class="commit-box cm7"><div class="commit-lbl cml7">Mi compromiso para la semana 8</div><textarea class="commit-input" rows="2" placeholder="Escribe tu compromiso..."></textarea><div class="sign-row"><div class="sign-line"></div><div class="sign-lbl">Firma · Sem 7</div></div></div>
+              <button class="eval-done-btn" id="evdone7" onclick="markEvalDone(7)">&#10003; Guardar evaluativo semana 7</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="week-item" id="w8">
+        <div class="week-header" onclick="toggleWeek('w8')">
+          <div class="week-num-badge w8-bg"><div class="wn-label">SEM</div><div class="wn-num">8</div></div>
+          <div class="week-meta">
+            <div class="week-title">TU PLAN DE INVERSIÓN PERSONAL</div>
+            <div class="week-tags"><span class="wtag w8-tag">Mód. 11 — Portafolio</span><span class="wtag w8-tag">Días 52–60</span></div>
+          </div>
+          <div class="week-right">
+            <div class="week-status" id="w8-status">Pendiente</div>
+            <div class="week-toggle">&#9660;</div>
+          </div>
+        </div>
+        <div class="week-body" id="w8-body">
+          <div class="week-body-inner">
+            <div class="week-focus-text">Semana de cierre. Construyes tu plan de inversión real con todo lo aprendido.</div>
+            <div class="cols"><div class="col-block"><div class="col-lbl w8-lbl">Módulo 11 — Portafolio</div><div class="items"><div class="item"><div class="item-dot w8-dot"></div>Gestión de portafolio y por qué importa.</div><div class="item"><div class="item-dot w8-dot"></div>Método de aporte: único, mensual o mixto.</div><div class="item"><div class="item-dot w8-dot"></div>La base inicial con SPY y QQQ.</div><div class="item"><div class="item-dot w8-dot"></div>Qué es un ETF y por qué es base sólida.</div></div></div><div class="col-block"><div class="col-lbl w8-lbl">Tu plan personal</div><div class="items"><div class="item"><div class="item-dot w8-dot"></div>Definir tu capital disponible.</div><div class="item"><div class="item-dot w8-dot"></div>Seleccionar tu método de aporte.</div><div class="item"><div class="item-dot w8-dot"></div>Documentar cómo organizarás tu portafolio.</div><div class="item"><div class="item-dot w8-dot"></div>Creación del plan de inversión personal.</div></div></div></div>
+            <div class="result-row w8-result">🚀 Método aprendido, práctica completada y plan listo.</div>
+            <button class="mark-btn w8-btn" onclick="markDone('w8')">&#10003; Marcar contenido como visto</button>
+            <div class="eval-section e8">
+              <div class="eval-header">
+                <div class="eval-badge">&#128203; Evaluativo</div>
+                <div class="eval-title">AUTOEVALUACI&#211;N &middot; SEMANA 8</div>
+              </div>
+              <div id="studentBanner8" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;background:rgba(30,42,138,0.04);border-radius:8px;display:none;"></div>
+              <div class="sec-lbl sl8">✓ Completé esta semana</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="q-title">¿Qué completaste?</div>
+        <div class="pill-row">
+          <div class="pill p8" onclick="togglePill(this)"><div class="pill-circle"></div>Módulo 11 completo</div>
+          <div class="pill p8" onclick="togglePill(this)"><div class="pill-circle"></div>Definí mi capital disponible</div>
+          <div class="pill p8" onclick="togglePill(this)"><div class="pill-circle"></div>Elegí mi método de aporte</div>
+          <div class="pill p8" onclick="togglePill(this)"><div class="pill-circle"></div>Plan de portafolio documentado</div>
+          <div class="pill p8" onclick="togglePill(this)"><div class="pill-circle"></div>Creé mi plan de inversión</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Cuál es tu método de aporte?</div>
+        <div class="pill-row">
+          <div class="pill p8" onclick="toggleSingle(this)"><div class="pill-circle"></div>Aporte único</div>
+          <div class="pill p8" onclick="toggleSingle(this)"><div class="pill-circle"></div>Aporte mensual</div>
+          <div class="pill p8" onclick="toggleSingle(this)"><div class="pill-circle"></div>Aporte mixto</div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-lbl sl8">📊 Autoevaluación final</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="rating-head"><div class="rating-head-lbl">Indicador final</div><div class="rating-head-nums"><div class="rhn">1</div><div class="rhn">2</div><div class="rhn">3</div><div class="rhn">4</div><div class="rhn">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Dominio del Método RCR</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Claridad de mi plan</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+        <div class="rating-row"><div class="rating-lbl">Confianza para el siguiente paso</div><div class="rating-dots"><div class="rdot" onclick="selectRating(this)">1</div><div class="rdot" onclick="selectRating(this)">2</div><div class="rdot" onclick="selectRating(this)">3</div><div class="rdot" onclick="selectRating(this)">4</div><div class="rdot" onclick="selectRating(this)">5</div></div></div>
+      </div>
+      <div class="card">
+        <div class="q-title">¿Cómo termino las 8 semanas?</div>
+        <div class="emoji-row">
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😕</div><div class="emoji-txt">Perdido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🙂</div><div class="emoji-txt">Regular</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">😊</div><div class="emoji-txt">Bien</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">💪</div><div class="emoji-txt">Sólido</div></div>
+          <div class="emoji-opt" onclick="selectEmoji(this)"><div class="emoji-icon">🔥</div><div class="emoji-txt">Listo</div></div>
+        </div>
+        <div class="open-lbl">Mi mayor aprendizaje de las 8 semanas:</div>
+        <textarea class="open-input" rows="2" placeholder="Escribe aquí..."></textarea>
+      </div>
+    </div>
+    
+    <div class="close-banner">
+      <div class="close-lbl">Cierre del programa</div>
+      <div class="close-title">TIENES EL MÉTODO. TIENES EL PLAN.</div>
+      <div class="close-text">Completaste las 8 semanas. El siguiente paso — abrir tu broker real y operar con dinero real — lo das acompañado. <strong>Ese paso te espera en el siguiente nivel.</strong></div>
+              <button class="eval-done-btn" id="evdone8" onclick="markEvalDone(8)">&#10003; Guardar evaluativo semana 8</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    <div class="milestone-bar"><div class="ms-icon">&#127919;</div><div><div class="ms-lbl">Al cerrar el d&#237;a 60</div><div class="ms-title">RESULTADO 8 SEMANAS</div><div class="ms-text">M&#233;todo RCR dominado, 13+ operaciones en demo, plan de inversi&#243;n personal construido.</div></div><div class="ms-badges"><div class="ms-badge"><div class="ms-badge-n">6</div><div class="ms-badge-l">M&#243;dulos<br>completos</div></div><div class="ms-badge"><div class="ms-badge-n">13+</div><div class="ms-badge-l">Ops demo<br>con m&#233;todo</div></div><div class="ms-badge"><div class="ms-badge-n">&#10003;</div><div class="ms-badge-l">Plan<br>listo</div></div></div></div>
+    <div class="close-bar"><div class="cb-icon">&#9889;</div><div><div class="cb-lbl">Lo que viene despu&#233;s</div><div class="cb-title">TIENES EL M&#201;TODO. TIENES EL PLAN.</div><div class="cb-text">El siguiente paso es <strong>abrir tu broker real y dar tu primera operaci&#243;n con dinero real.</strong></div></div></div>
+  </div>
+  <div class="foot"><div class="foot-text">@aqfinanzas &middot; Club Excedente &middot; Alejandro Qui&#241;ones &middot; 2026</div></div>
+</div>
+<script>
+var studentData = {nombre:'', apellido:'', email:''};
+
+function saveStudent() {
+  studentData.nombre = document.getElementById('alumnoNombre').value.trim();
+  studentData.apellido = document.getElementById('alumnoApellido').value.trim();
+  studentData.email = document.getElementById('alumnoEmail').value.trim();
+  // Update banners in other weeks
+  var display = studentData.nombre || studentData.apellido ? 
+    (studentData.nombre + ' ' + studentData.apellido).trim() + (studentData.email ? ' · ' + studentData.email : '') : '';
+  for (var i = 2; i <= 8; i++) {
+    var b = document.getElementById('studentBanner' + i);
+    if (b) { b.textContent = display; b.style.display = display ? 'block' : 'none'; }
+  }
+}
+
+function sendToSheets(semana) {
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQ2ZEnV7mEjMrAzom6iglfYMgzAxl1BAopkzLRZQ8V06RcwkDXBqjiiJknZHFDkX12kQ/exec';
+  if (SCRIPT_URL === 'SHEETS_URL_PLACEHOLDER') return; // not configured yet
+  var payload = {
+    fecha: new Date().toLocaleDateString('es-CO'),
+    nombre: studentData.nombre,
+    apellido: studentData.apellido,
+    email: studentData.email,
+    semana: semana
+  };
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).catch(function(e){ console.log('Sheets error:', e); });
+}
+
+function toggleWeek(id){var item=document.getElementById(id);var body=document.getElementById(id+'-body');var isOpen=item.classList.contains('open');item.classList.toggle('open',!isOpen);body.style.maxHeight=isOpen?'0':(body.scrollHeight+400)+'px';}
+function switchPhase(n){document.querySelectorAll('.phase-tab').forEach(function(t){t.classList.remove('active','orange');});document.querySelectorAll('.phase-panel').forEach(function(p){p.classList.remove('active');});var tab=document.getElementById('tab'+n);tab.classList.add('active');if(n===2)tab.classList.add('orange');document.getElementById('panel'+n).classList.add('active');window.scrollTo({top:document.querySelector('.phase-tabs').offsetTop-70,behavior:'smooth'});}
+var completed=new Set();
+function markDone(id){var btn=document.querySelector('#'+id+' .mark-btn');var status=document.getElementById(id+'-status');if(completed.has(id)){completed.delete(id);btn.textContent='✓ Marcar contenido como visto';btn.classList.remove('done');status.textContent='Pendiente';status.style.color='';}else{completed.add(id);btn.textContent='✅ Contenido completado';btn.classList.add('done');status.textContent='✅ Completada';status.style.color='#1DB86E';}var pct=Math.round((completed.size/8)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressPct').textContent=pct+'%';}
+var evalDone=new Set();
+function markEvalDone(w){var btn=document.getElementById('evdone'+w);if(evalDone.has(w)){evalDone.delete(w);btn.textContent='✓ Guardar evaluativo semana '+w;btn.classList.remove('done');}else{evalDone.add(w);btn.textContent='✅ Evaluativo guardado · Semana '+w;btn.classList.add('done');sendToSheets(w);}}
+function togglePill(el){el.classList.toggle('selected');}
+function toggleSingle(el){var row=el.closest('.pill-row');row.querySelectorAll('.pill').forEach(function(p){p.classList.remove('selected');});el.classList.add('selected');}
+function selectRating(el){var row=el.closest('.rating-dots');row.querySelectorAll('.rdot').forEach(function(d){d.classList.remove('selected');});el.classList.add('selected');}
+function selectEmoji(el){var row=el.closest('.emoji-row');row.querySelectorAll('.emoji-opt').forEach(function(e){e.classList.remove('selected');});el.classList.add('selected');}
+</script>
+</body>
+</html>
